@@ -1,5 +1,6 @@
 import connection from "../dbStrategy/postgresdb.js";
 import signupSchema from "../schemas/signupSchema.js";
+import signinSchema from "../schemas/signinSchema.js";
 
 export async function validateSignup(req,res,next) { 
     const { email, password, repeatPassword } = req.body;
@@ -18,5 +19,14 @@ export async function validateSignup(req,res,next) {
         console.log(error);
         return res.sendStatus(500);
     }
+    next();
+}; 
+
+export async function validateSignin(req,res,next) { 
+    const validation = signinSchema.validate(req.body);
+    
+    if(validation.error) { 
+        return res.sendStatus(422);
+    } 
     next();
 }
