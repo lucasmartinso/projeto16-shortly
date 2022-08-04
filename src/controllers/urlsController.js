@@ -39,10 +39,15 @@ export async function getUrlbyId(req,res) {
 
 export async function getUrlbyShortUrl(req,res) { 
     const { shortUrl } = req.params;
-    const userId = res.locals.userId;
 
     try { 
         const { rows: urlId } = await connection.query('SELECT id,url FROM urls WHERE "shortUrl"= $1',[shortUrl]);
+        const { rows: userId } = await connection.query(`
+            SELECT uu."userId" 
+            FROM "urlsUsers" uu 
+            JOIN urls u ON u.id = uu."userId"
+            WHERE u.url = $1
+            `,[urlId[0].url]);
         await connection.query('INSERT INTO visits ("urlId","userId") VALUES ($1,$2)',[urlId[0].id,userId[0].userId]);
         const { rows: visits } = await connection.query(`
             SELECT urls.id, urls."shortUrl",urls.url, COUNT(visits."urlId") AS visits
@@ -85,4 +90,4 @@ export async function deleteUrl(req,res) {
         console.log(error);
         return res.sendStatus(500);
      }
-}
+};
