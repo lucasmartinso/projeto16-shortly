@@ -43,9 +43,9 @@ export async function getUrlbyShortUrl(req,res) {
     try { 
         const { rows: urlId } = await connection.query('SELECT id,url FROM urls WHERE "shortUrl"= $1',[shortUrl]);
         const { rows: userId } = await connection.query(`
-            SELECT uu."userId" 
+            SELECT uu."userId",u.url 
             FROM "urlsUsers" uu 
-            JOIN urls u ON u.id = uu."userId"
+            JOIN urls u ON u.id = uu."urlId"
             WHERE u.url = $1
             `,[urlId[0].url]);
         await connection.query('INSERT INTO visits ("urlId","userId") VALUES ($1,$2)',[urlId[0].id,userId[0].userId]);
