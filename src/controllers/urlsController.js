@@ -35,19 +35,34 @@ export async function getUrlbyId(req,res) {
 
 export async function getUrlbyShortUrl(req,res) { 
     const { shortUrl } = req.params;
-    console.log(shortUrl); 
+    const userId = res.locals.userId;
 
     try { 
-        await connection.query('INSERT INTO visits ("urlId","userId") VALUES ($1,$2)',[])
+        const { rows: urlId } = await connection.query('SELECT id,url FROM urls WHERE "shortUrl"= $1',[shortUrl]);
+        await connection.query('INSERT INTO visits ("urlId","userId") VALUES ($1,$2)',[urlId[0].id,userId[0].userId]);
         const { rows: visits } = await connection.query(`
-            SELECT urls.id, urls."shortUrl",urls.url, SUM(visits."urlId") AS visits,
+            SELECT urls.id, urls."shortUrl",urls.url, COUNT(visits."urlId") AS visits
             FROM urls 
             JOIN visits ON urls.id = visits."urlId" 
-            GROUP BY visits."urlId"
-        `);
-        return res.send(visits).status(200);
+            WHERE urls."shortUrl" = $1
+            GROUP BY visits."urlId", urls.id
+        `,[shortUrl]);
+        console.log(visits);
+        return res.redirect(200,urlId[0].url);
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
     }
 };
+
+export async function deleteUrl(req,res) { 
+    const { id } = req.params;
+    const userId = res.locals.userId;
+
+     try {
+        const { rows: findUrl } = await connection.query('SELECT * FROM urls ')
+     } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+     }
+}

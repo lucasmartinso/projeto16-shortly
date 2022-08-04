@@ -9,6 +9,7 @@ export async function validateAuth(req,res,next) {
         if(permission.length === 0) { 
             return res.sendStatus(401);
         }
+        res.locals.userId = permission;
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
