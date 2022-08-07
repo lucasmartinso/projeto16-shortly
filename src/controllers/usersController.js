@@ -35,5 +35,20 @@ export async function getHistoric(req,res) {
 };
 
 export async function getRanking(req,res) { 
-
+    try {
+        const { rows: ranking } = await connection.query(`
+            SELECT users.id, users.name, COUNT(uu."urlId") AS "linksCount", SUM(v."countVisits") AS "visitCount"
+            FROM users
+            JOIN  "urlsUsers" uu ON uu."userId" = users.id
+            JOIN urls ON urls.id = uu."urlId"
+            JOIN visits v ON urls.id = v."urlId"
+            GROUP BY users.id
+            ORDER BY "visitCount" DESC
+            OFFSET 0 LIMIT 10
+            `);
+        return res.send(ranking);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
 };
