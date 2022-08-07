@@ -6,6 +6,10 @@ export async function getHistoric(req,res) {
     const userId = res.locals.userId;
     
     try {
+        const { rows: verifyUser } = await connection.query(`SELECT * FROM users WHERE id= $1`,[userId[0].userId]); 
+        if(verifyUser.length === 0) { 
+            return res.sendStatus(404);
+        }
         const { rows: historic } = await connection.query(`SELECT json_build_object(
             'id', users.id,
             'name', users.name,
