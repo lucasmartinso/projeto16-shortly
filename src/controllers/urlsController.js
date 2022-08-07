@@ -83,9 +83,11 @@ export async function deleteUrl(req,res) {
             WHERE uu."userId" = $1 AND uu."urlId"= $2
             `,[userId[0].userId,id]);
         if(belongUser.length===0) { 
+            console.log(belongUser);
             return res.sendStatus(401);
         }    
         await connection.query('DELETE FROM "urlsUsers" WHERE "urlId"= $1',[id]);
+        await connection.query('DELETE FROM visits WHERE "urlId"= $1',[id]);
         await connection.query('DELETE FROM urls WHERE url= $1',[belongUser[0].url]);
         return res.sendStatus(204);
      } catch (error) {

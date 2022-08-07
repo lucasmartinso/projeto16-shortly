@@ -27,6 +27,16 @@ export async function getHistoric(req,res) {
             WHERE users.id= $1
             GROUP BY users.id
             `,[userId[0].userId]);
+        if(historic.length===0) {  
+            console.log(verifyUser[0]);
+            const userWithNothing = { 
+                id: verifyUser[0].id, 
+                name: verifyUser[0].name, 
+                visitCount: 0, 
+                shortenedUrls: []
+            };
+            return res.send([userWithNothing]);
+        }
         return res.send(historic.map(hist => hist.json_build_object)).status(200);
     } catch (error) {
         console.log(error);
