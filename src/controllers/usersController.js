@@ -56,6 +56,19 @@ export async function getRanking(req,res) {
             ORDER BY "visitCount" DESC
             OFFSET 0 LIMIT 10
             `);
+        const { rows: usersWithNothing } = await connection.query('SELECT * FROM users');
+        for(let i=0; i<usersWithNothing.length; i++) { 
+            const find = ranking.find(item => item.id === i+1);
+            if(!find) { 
+                let newRankUser = { 
+                    id: usersWithNothing[i].id, 
+                    name: usersWithNothing[i].name,
+                    linksCount: 0, 
+                    visitCount: 0
+                }
+                ranking.push(newRankUser);
+            }
+        }
         return res.send(ranking);
     } catch (error) {
         console.log(error);
