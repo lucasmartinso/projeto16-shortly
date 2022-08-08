@@ -4,10 +4,10 @@ import signinSchema from "../schemas/signinSchema.js";
 import bcrypt from "bcrypt";
 
 export async function validateSignup(req,res,next) { 
-    const { email, password, repeatPassword } = req.body;
+    const { email, password, confirmPassword } = req.body;
     const validation = signupSchema.validate(req.body);
     
-    if(validation.error || password !== repeatPassword) { 
+    if(validation.error || password !== confirmPassword) { 
         return res.sendStatus(422);
     } 
 
